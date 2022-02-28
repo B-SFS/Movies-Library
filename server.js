@@ -1,74 +1,116 @@
 'use strict';
+// initelizing variables
+
+// Get express from node model
 const express = require("express");
-const data = require("./MovieData/data.json");
+
+// initializing my server
 const app = express();
-const Api = require("axios");
-const axios = axios();
-app.get('/' , moviesHandler)
-app.get('/favorite' , favouritePageHandler)
-app.get('/trending', trendingHandler);
-app.get('/searchMovies', searchMoviesHandler);
-app.use("*", notFoundHandler);
-app.use(errorHandler);
 
-const KEY = "9156d3294f952e6f7e07e6b1710bcf32";
+// read data from JSON file
+const localJsonData = require("./MovieData/data.json");
+
+// Get axios so we can send HTTP requests to an API
+
+const axios = require("axios");
+
+// READ .env file
+const env = require("dotenv");
+// start(config).env
+env.config();
+
+// variables coming from .env file;
+const APIKEY = process.env.APIKEY;
+
+const PORT = process.env.PORT;
+// connect to DB, and init the Client
+
+//end initelizing variables
+
+// To get the data from the body object, it should be upove the paths
 
 
-axios.get(`https://api.themoviedb.org/3/search/movie?api_key=${KEY}&language=en-US&query}`)
-    .then(apiResponse=> {
+// GET: paths
+app.get("/", MovieDataJson);
+app.get("/favorite", favoritePageHandler)
+app.get("/trending", apiMovieData)
+app.get("/search" , MovieSearchHandler)
 
-        apiResponse.data.results.map(value => {
-            let oneResult = new Movie(value.id, value.title,value.release_date, value.poster_path, value.overview);
-            results.push(oneResult);
+// should be at the end
+app.use("*", notFoundHandler)
+// using the handle error funciton 
+app.use(ErrorHandler);
+// POST: paths
+
+
+// functions
+//constructor
+function MovieInfo(id, title, release_date, poster_path, overview) {
+    this.id = id;
+    this.title = title;
+    this.release_date = release_date;
+    this.poster_path = poster_path;
+    this.overview = overview;
+}
+//end constructor
+
+// function1
+function MovieDataJson(request, response) {
+    let specificInfo = new MovieInfo(localJsonData.title, localJsonData.poster_path, localJsonData.overview)
+    return response.status(200).json(specificInfo)
+}
+// function2
+function favoritePageHandler(req, res) {
+    res.status(200).send("Welcome to Favorite Page")
+}
+//  function3
+function notFoundHandler(req, res) {
+    res.status(404).send("Not Found!")
+}
+// function4
+function apiMovieData(req, res) {
+
+    let apiArray = []
+    axios.get(`https://api.themoviedb.org/3/trending/all/week?api_key=${APIKEY}&language=en-US`)
+        .then(result => {
+            result.data.results.map(value => {
+                let specificApiInfo = new MovieInfo(value.id, value.title, value.release_date, value.poster_path, value.overview)
+                apiArray.push(specificApiInfo);
+            })
+           res.status(200).json(apiArray);
+        }).catch(error=>{
+            ErrorHandler(error,req,res)
         });
-
-        return res.status(200).json(results);
-    })
-    .catch(error => {
-        errorHandler(req, res,error);
-    })
-    function trendingHandler(request, response){
-        let result = [];
-        axios.get(`https://api.themoviedb.org/3/trending/all/week?api_key=${KEY}&language=en-US`)
-        .then(apiResponse => {
-            apiResponse.data.results.map(value => {
-                let oneResult = new Movie(value.id, value.title,value.release_date, value.poster_path, value.overview);
-                result.push(oneResult);
-            });
     
-            return response.status(200).json(result);
-    
-        }).catch(error => {
-            errorHandler(request, response, error);
-        });
-    }
-
-    function errorHandler(request, response, error){
-
-        const err = {
-            status : 500,
-            message : error
-        }
-    
-        return res.status(500).send(err);
-    }
-
-function movieInfo(title,potser_path,overview){
-this.title = title;
-this.path = potser_path;
-this.overvew = overview;
 }
+// function5
 
-function moviesHandler(req , res){
-    let arr = []
-let spiderMan = new movieInfo("Spider-Man: No Way Home","/1g0dhYtq4irTY1GPXvft6k4YLjm.jpg","Peter Parker is unmasked and no longer able to separate his normal life from the high-stakes of being a super-hero. When he asks for help from Doctor Strange the stakes become even more dangerous, forcing him to discover what it truly means to be Spider-Man.");
-arr.push(spiderMan);
-return res.status(200).send(arr); 
-}
-function favouritePageHandler(request , response)
-{
-    return response.send("Welcome to Favorite Page");
-}
-app.listen(3000,() => {
-    console.log("Listen on 3000");
+function MovieSearchHandler(req , res){
+const search = req.query.MovieName
+const searchResults = [];
+axios.get(`https://api.themoviedb.org/3/search/movie?api_key=${APIKEY}&language=en-US&query=${search}`)
+.then(apiResponse=>{
+apiResponse.data.results.map(value =>{
+const movie = new MovieInfo(value.id || "N/A",value.title || "N/A",value.release_date || "N/A",value.poster_path || "N/A",value.overview || "N/A")
+searchResults.push(movie);
 });
+return res.status(200).json(searchResults);
+}).catch(error=>{
+    ErrorHandler(error,req,res)
+})
+
+
+}
+// function6
+function ErrorHandler(error,req,res){
+const err = {
+    status:500,
+    message:error
+}
+return res.status(500).send(err)
+}
+// end functions
+app.listen(PORT, () => {
+    console.log(`Your are in Port ${PORT}`);
+
+})

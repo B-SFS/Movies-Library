@@ -5,9 +5,11 @@
 ## WRRC
 ![WRRCIMAGE](./img/WRRC.png)
 ## Overview
-
+* send requests and get results.
+* Working on the search were you can search for a movie and get a result
 ## Getting Started
-<!-- What are the steps that a user must take in order to build this app on their own machine and get it running? -->
-
+* Creating some functions to handle some endpoints like (trending , search)
+* Create a function to handle the not founded endpoints
+* Create a function to handle the errors
 ## Project Features
 <!-- What are the features included in you app -->
