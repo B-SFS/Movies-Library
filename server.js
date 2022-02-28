@@ -35,7 +35,7 @@ app.get("/", MovieDataJson);
 app.get("/favorite", favoritePageHandler)
 app.get("/trending", apiMovieData)
 app.get("/search" , MovieSearchHandler)
-
+app.get("/reviews" , ReviewsHandler)
 // should be at the end
 app.use("*", notFoundHandler)
 // using the handle error funciton 
@@ -107,7 +107,10 @@ const err = {
     status:500,
     message:error
 }
-return res.status(500).send(err)
+}
+// function7
+function ReviewsHandler(req,res){
+ 
 }
 // end functions
 app.listen(PORT, () => {
