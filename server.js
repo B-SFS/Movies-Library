@@ -19,29 +19,35 @@ const env = require("dotenv");
 // start(config).env
 env.config();
 
+// connecting the database with the server
+const pg = require("pg");
+const { response } = require("express");
+
 // variables coming from .env file;
 const APIKEY = process.env.APIKEY;
-
+const DATABASE_URL = process.env.DATABASE_URL;
 const PORT = process.env.PORT;
-// connect to DB, and init the Client
-
 //end initelizing variables
-
+// initialize the connection
+const client = new pg.Client(DATABASE_URL);
 // To get the data from the body object, it should be upove the paths
 
 
 // GET: paths
+app.use(express.json());
 app.get("/", MovieDataJson);
 app.get("/favorite", favoritePageHandler)
 app.get("/trending", apiMovieData)
 app.get("/search" , MovieSearchHandler)
 app.get("/reviews" , ReviewsHandler)
+app.post("/addmovie" , addMovieHandler)
+app.get("/getmovies" , getDataBaseMoviesHandler)
+
 // should be at the end
 app.use("*", notFoundHandler)
 // using the handle error funciton 
 app.use(ErrorHandler);
 // POST: paths
-
 
 // functions
 //constructor
@@ -112,8 +118,31 @@ const err = {
 function ReviewsHandler(req,res){
  
 }
+// function 8 
+function addMovieHandler(req , res){
+ const movie = req.body;
+ const sql = `INSERT INTO MOVIELIST(title,release_date,poster_path,overview) VALUES ($1,$2,$3,$4) RETURNING * `
+ const values = [movie.title,movie.release_date,movie.poster_path,movie.overview]
+ client.query(sql,values).then(result =>{
+    return res.status(201).json(result.rows);
+ }).catch((error) =>{
+     ErrorHandler(error,req,res)
+ })
+//  return res.status(200).json(data);
+}
+function getDataBaseMoviesHandler(req,res){
+const sql = `SELECT * FROM MOVIELIST`
+client.query(sql).then((result)=>{
+    return res.status(200).json(result.rows);
+}).catch((error)=>{
+    ErrorHandler(error,res,req)
+})
+}
 // end functions
-app.listen(PORT, () => {
+client.connect()
+.then(()=>{
+    app.listen(PORT, () => {
     console.log(`Your are in Port ${PORT}`);
 
+})
 })
