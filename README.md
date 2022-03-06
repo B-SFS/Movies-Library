@@ -17,5 +17,7 @@
 * Getting the data from the table using the select * from the name of the table querey
 * Adding the WRRC for the Process with the database
 ## ![WRRCIMAGE](./img/WRRCFORDATABASE.jpg)
+* Adding update handler function to update on the tables data
+* Adding delete hanlder function to delete and existing rows in the table
 ## Project Features
 <!-- What are the features included in you app -->
