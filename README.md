@@ -11,5 +11,11 @@
 * Creating some functions to handle some endpoints like (trending , search)
 * Create a function to handle the not founded endpoints
 * Create a function to handle the errors
+* Creating a database 
+* Creating a table 
+* Inserting data to the table using the body of the post request
+* Getting the data from the table using the select * from the name of the table querey
+* Adding the WRRC for the Process with the database
+## ![WRRCIMAGE](./img/WRRCFORDATABASE.jpg)
 ## Project Features
 <!-- What are the features included in you app -->
