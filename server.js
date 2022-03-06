@@ -42,7 +42,9 @@ app.get("/search" , MovieSearchHandler)
 app.get("/reviews" , ReviewsHandler)
 app.post("/addmovie" , addMovieHandler)
 app.get("/getmovies" , getDataBaseMoviesHandler)
-
+app.put("/update/:id" , updateMoviesHandler)
+app.delete("/delete/:id" , deleteMoviesHandler)
+app.get("/getspesificmovie/:id" , getSpecificMovieHandler)
 // should be at the end
 app.use("*", notFoundHandler)
 // using the handle error funciton 
@@ -130,12 +132,43 @@ function addMovieHandler(req , res){
  })
 //  return res.status(200).json(data);
 }
+// function 9
 function getDataBaseMoviesHandler(req,res){
 const sql = `SELECT * FROM MOVIELIST`
 client.query(sql).then((result)=>{
     return res.status(200).json(result.rows);
 }).catch((error)=>{
     ErrorHandler(error,res,req)
+})
+}
+// function 10
+function getSpecificMovieHandler(req,res){
+    const specificMovie = req.params.id
+    const sql = `SELECT * FROM MOVIELIST WHERE id=$1`
+    const values = [specificMovie];
+    //  console.log(specificMovie);
+    client.query(sql,values).then(result=>{
+        res.status(200).json(result.rows)
+    })
+}
+// function 11
+function updateMoviesHandler(req,res){
+const movie = req.params.id
+const data = req.body
+const sql  = `UPDATE MOVIELIST SET title=$1,release_date=$2,poster_path=$3,overview=$4 where id=$5 RETURNING *;`;
+const values =[data.title,data.release_date,data.poster_path,data.overview,movie]
+client.query(sql,values).then(result=>{
+res.status(200).json(result.rows);
+})
+
+}
+// function 12 
+function deleteMoviesHandler(req,res){
+const movie = req.params.id;
+const sql = `DELETE  FROM MOVIELIST WHERE id=$1 `
+const values = [movie];
+client.query(sql,values).then(()=>{
+    res.status(204).json({});
 })
 }
 // end functions
