@@ -29,7 +29,11 @@ const DATABASE_URL = process.env.DATABASE_URL;
 const PORT = process.env.PORT;
 //end initelizing variables
 // initialize the connection
-const client = new pg.Client(DATABASE_URL);
+// const client = new pg.Client(DATABASE_URL);
+const client = new pg.Client({
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false }
+});
 // To get the data from the body object, it should be upove the paths
 
 
@@ -178,4 +182,4 @@ client.connect()
     console.log(`Your are in Port ${PORT}`);
 
 })
-
+})
