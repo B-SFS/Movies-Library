@@ -49,6 +49,8 @@ app.get("/getmovies" , getDataBaseMoviesHandler)
 app.put("/update/:id" , updateMoviesHandler)
 app.delete("/delete/:id" , deleteMoviesHandler)
 app.get("/getspesificmovie/:id" , getSpecificMovieHandler)
+app.get('/company', companyHandler);
+app.get('/network', networkHandler);
 // should be at the end
 app.use("*", notFoundHandler)
 // using the handle error funciton 
@@ -174,6 +176,34 @@ const values = [movie];
 client.query(sql,values).then(()=>{
     res.status(204).json({});
 })
+}
+// function13
+function companyHandler(request, response){
+
+    const companyID = request.query.companyid;
+
+    axios.get(`https://api.themoviedb.org/${companyID}/company/5?api_key=${KEY}`)
+    .then(apiResponse => {
+
+        return response.status(200).json(apiResponse.data);
+
+    }).catch(error => {
+        errorHandler(request, response, error);
+    });
+}
+// function14
+function networkHandler(req, res){
+
+    const networkID = req.query.networkid;
+
+    axios.get(`https://api.themoviedb.org/${networkID}/company/5?api_key=${KEY}`)
+    .then(apiResponse => {
+
+        return res.status(200).json(apiResponse.data);
+
+    }).catch(error => {
+        errorHandler(req, res, error);
+    });
 }
 // end functions
 client.connect()
